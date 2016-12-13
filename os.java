@@ -134,13 +134,15 @@ public class os {
 	public static void Tro(int[]a, int[]p){ //start to do!!!!!!!!
 		Bookkeeping(p[5]);
 		if(JobTable.get(lastJobRunning).getCpuTimeNeeded()==0) {
-			if(!JobTable.get(lastJobRunning).getLatched()){
+			if(JobTable.get(lastJobRunning).getIOPending()==0){    //if(!JobTable.get(lastJobRunning).getLatched() && JobTable.get(lastJobRunning).getIOPending()==0){
 			cleanUp(lastJobRunning);
 		} else { JobTable.get(lastJobRunning).setTerminated();}
 		}
+		System.out.println(" Memory at 0  is " + MemoryTable[0]);
 		System.out.println("Ready Queue is right now :   ");
 		for(int i=0; i<readyQueue.size(); i++) {
 		System.out.println(readyQueue.get(i) + "  ");
+
 	}
 		MemoryManager();
 		CpuScheduler();
