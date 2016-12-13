@@ -244,17 +244,18 @@ public class os {
 		if(!doingSwap) { //check if not doing swap - if yes, wait till finish it
 			if(drumToCoreQueue.size()!=0) //if jobs wait for memory
 				for(int i=0; i<drumToCoreQueue.size(); i++){
-					//if(FreeSpaceTable.findMemorySpace(JobTable.get(drumToCoreQueue.get(i)).getJobNum())) { //found space in memory and job to be placed by swapper
+					//found space in memory and job to be placed by swapper
 					if(findMemorySpace(JobTable.get(drumToCoreQueue.get(i)).getJobNum())) {
 						//if(MemoryTable.findMemorySpace(JobTable.get(drumToCoreQueue.get(i)).getJobNum())) {
 						swapInMemory = drumToCoreQueue.get(i);																//using job number in jobtable
 						Swapper();  //if found space in our table, then we need to start swap into sos memory
 						break;			//swapInMemory holds Job num
 				} else {
+
 			//swapper();//no memory for job to be placed - maybe to swap out???
 					}
 				}
-		}
+		} //else for first if
 	}
 
 	public static void Bookkeeping(int currentTime) { //current time is p[5] value
@@ -286,7 +287,7 @@ public class os {
 	}
 
 
-//What if I put FreeSpaceTable in os file????
+//What if I put FreeSpaceTable in os file???? it worked
 public static boolean findMemorySpace(int jobNum) {//pass value job size
 		int freeSpace;
 		int MemoryIndex;
@@ -294,9 +295,11 @@ public static boolean findMemorySpace(int jobNum) {//pass value job size
 		for(int i=0; i<100; i++) {
 			freeSpace=0;
 			MemoryIndex=i;
+			if(i>99) {return memoryAvailable;}
 			while(MemoryTable[i]==0) {
 				freeSpace++;
 				i++;
+				if(i==99) { break; } //no memory to place job
 				if(freeSpace==JobTable.get(jobNum).getJobSize()){
 					JobTable.get(jobNum).setMemoryAddress(MemoryIndex);
 					JobTable.get(jobNum).setInCore();
