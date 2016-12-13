@@ -102,6 +102,9 @@ public class os {
 			JobTable.get(jobIO).unBlocked();
 			//readyQueue.add(ioQueue.getFirst()); //it was on Ready Queue still
 		}
+		if(JobTable.get(jobIO).getTerminated()) { // kill the job as it finisged IO and wants to be terminated
+				cleanUp(jobIO);
+		}
 		//pick job to do IO if you have jobs on IOqueue need to do it
 		if(ioQueue.size()>0) { //still have jobs to do IO
 			doingIONow = true;
@@ -125,13 +128,24 @@ public class os {
 		CpuScheduler();
 		Dispatcher(a, p);
 
+
 	}
 //job finished running its TimeSlice, put it on readyQueue and schedule another Job
 	public static void Tro(int[]a, int[]p){ //start to do!!!!!!!!
 		Bookkeeping(p[5]);
+		if(JobTable.get(lastJobRunning).getCpuTimeNeeded()==0) {
+			if(!JobTable.get(lastJobRunning).getLatched()){
+			cleanUp(lastJobRunning);
+		} else { JobTable.get(lastJobRunning).setTerminated();}
+		}
+		System.out.println("Ready Queue is right now :   ");
+		for(int i=0; i<readyQueue.size(); i++) {
+		System.out.println(readyQueue.get(i) + "  ");
+	}
 		MemoryManager();
 		CpuScheduler();
 		Dispatcher(a, p);
+
 	}
 
 	/*
@@ -147,14 +161,15 @@ public class os {
 		Bookkeeping(p[5]); //save jobtToRun records by using Bookkeper
 
 
-		if(a[0]==5) { //job wants to terminate, check if doing io, if not - kill it
-//will do it later
+		if(a[0]==5) { //job wants to terminate, check if doing io right now, if not - kill it
+
 			JobTable.get(lastJobRunning).setTerminated();
 			if(!JobTable.get(lastJobRunning).getLatched()) {
-					addMemorySpace(lastJobRunning);
-					JobTable.removeJob(JobTable.get(lastJobRunning));
-					ioQueue.remove(lastJobRunning);
-					readyQueue.remove(lastJobRunning);
+					cleanUp(lastJobRunning);
+					//addMemorySpace(lastJobRunning);
+					//JobTable.removeJob(JobTable.get(lastJobRunning));
+					//ioQueue.remove(lastJobRunning);
+					//readyQueue.remove(lastJobRunning);
 			}
 		} else if(a[0]==6) { //job wants IO, add it to IO queue.
 				JobTable.get(lastJobRunning).setIOPending(); //update JobTable Job IO Pending (Increment)
@@ -221,10 +236,11 @@ public class os {
 			jobToRun = 0;
 		} else if (JobTable.get(jobToRun).getCpuTimeNeeded()<=0) {
 				a[0] = 1; //no jobs => idle, no need in p[] values
-				addMemorySpace(jobToRun);
-					JobTable.removeJob(JobTable.get(jobToRun));
-					ioQueue.remove(jobToRun);
-					readyQueue.remove(jobToRun);
+					cleanUp(jobToRun);//
+					//addMemorySpace(jobToRun);
+					//JobTable.removeJob(JobTable.get(jobToRun));
+					//ioQueue.remove(jobToRun);
+					//readyQueue.remove(jobToRun);
 					jobToRun = 0;
 
 		} else {
@@ -327,6 +343,18 @@ public static boolean findMemorySpace(int jobNum) {//pass value job size
 		for(int i=JobTable.get(jobNum).getMemoryAddress(); i<(JobTable.get(jobNum).getJobSize()+JobTable.get(jobNum).getMemoryAddress()); i++) {
 			MemoryTable[i]=0;
 		}
+	}
+
+	public static void cleanUp(int jobNum) { //take terminated job out of everything, indicate which job to kill
+					addMemorySpace(jobNum);
+					JobTable.removeJob(JobTable.get(jobNum));
+					if(ioQueue.contains(Integer.valueOf(jobNum)))
+					{
+						ioQueue.remove(Integer.valueOf(jobNum));
+					}
+					if(readyQueue.contains(Integer.valueOf(jobNum))){
+					readyQueue.remove(Integer.valueOf(jobNum));
+				}
 	}
 
 }
