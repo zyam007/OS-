@@ -102,7 +102,7 @@ public class os {
 			JobTable.get(jobIO).unBlocked();
 			//readyQueue.add(ioQueue.getFirst()); //it was on Ready Queue still
 		}
-		if(JobTable.get(jobIO).getTerminated()) { // kill the job as it finisged IO and wants to be terminated
+		if(JobTable.get(jobIO).getTerminated() && JobTable.get(jobIO).getIOPending() ==0) { // kill the job as it finisged IO and wants to be terminated
 				cleanUp(jobIO);
 		}
 		//pick job to do IO if you have jobs on IOqueue need to do it
@@ -166,12 +166,8 @@ public class os {
 		if(a[0]==5) { //job wants to terminate, check if doing io right now, if not - kill it
 
 			JobTable.get(lastJobRunning).setTerminated();
-			if(!JobTable.get(lastJobRunning).getLatched()) {
+			if(JobTable.get(lastJobRunning).getIOPending()==0) { //terminate if no io pending
 					cleanUp(lastJobRunning);
-					//addMemorySpace(lastJobRunning);
-					//JobTable.removeJob(JobTable.get(lastJobRunning));
-					//ioQueue.remove(lastJobRunning);
-					//readyQueue.remove(lastJobRunning);
 			}
 		} else if(a[0]==6) { //job wants IO, add it to IO queue.
 				JobTable.get(lastJobRunning).setIOPending(); //update JobTable Job IO Pending (Increment)
@@ -223,10 +219,11 @@ public class os {
 		}
 	}
 
-	public static void Swapper(){ //swaps job in
+	public static void Swapper(){ //swaps job in NEED TO REDO SWAPPER -
 			 //if swap is false => there is no job doing swap right now
 			doingSwap = true;  //starting swap now
 			drumToCoreQueue.remove(swapInMemory);
+			System.out.println("Memory at 87 is " + MemoryTable[87]);
 			sos.siodrum(JobTable.get(swapInMemory).getJobNum(), JobTable.get(swapInMemory).getJobSize(), JobTable.get(swapInMemory).getMemoryAddress(),0); //0 => direction of swap
 			 //remove job from queue
 		//sos.siodrum(job.getJobNum(), job.getJobSize(), job.getMemoryAddress(),0);
