@@ -1,6 +1,9 @@
-
-
-public class PCB {
+/*
+ * Class to create object for each arriving Job
+ * and to hold and change the values regarding that specific job
+ */
+public class PCB
+{
 	int JobNum;
 	int Size;
 	int StartTime;
@@ -8,21 +11,22 @@ public class PCB {
 	int CpuTimeUsed;
 	int MaxCpuTime;
 	int IOPending;
-	int IOComp;
 	int Priority;
 	int MemoryAddress;
 	boolean Blocked;
 	boolean Latched; //Job currently doing IO, cannot be swapped out
 	boolean InCore;
 	boolean Terminated;
-	boolean Overwrite;
-	boolean KillBit;
 
-
-	//everything about the job saved in this constructor
-	public PCB(int JobNum, int Priority, int Size, int MaxCpuTime, int StartTime ){
+	/*
+	 * Constructor for Job object
+	 * saves variables obout arriving Job passed in argument
+	 * and initialize all variables to base case
+	 */
+	public PCB(int JobNum, int Priority, int Size, int MaxCpuTime, int StartTime )
+	{
 		this.JobNum = JobNum;
-		this.Priority = Priority; //we don't use priority
+		this.Priority = Priority; //we don't use priority but we save it just in case
 		this.Size = Size;
 		this.MaxCpuTime = MaxCpuTime;
 		this.StartTime = 0;
@@ -32,121 +36,139 @@ public class PCB {
 		InCore = false;
 		Terminated = false;
 		IOPending = 0;
-		IOComp = 0;
-		KillBit = false;
 		MemoryAddress = -1;
-		this.CpuTimeNeeded = MaxCpuTime;
-
-		//getters
+		CpuTimeNeeded = MaxCpuTime;
 	}
 
-	public int getJobNum(){
+	/*
+	 * Getters functions to retrieve information about the Job
+	 */
+	public int getJobNum() 
+	{
 		return JobNum;
 	}
 
-	public int getJobSize(){
+	public int getJobSize()
+	{
 		return Size;
 	}
 
-	public int getCpuTimeNeeded(){
+	public int getCpuTimeNeeded()
+	{
 		return CpuTimeNeeded;
 	}
 
-	public int getCpuTimeUsed(){
+	public int getCpuTimeUsed()
+	{
 		return CpuTimeUsed;
 	}
 
-	public int getMaxCpuTime(){
+	public int getMaxCpuTime()
+	{
 		return MaxCpuTime;
 	}
 
-	public int getIOPending(){
+	public int getIOPending()
+	{
 		return IOPending;
 	}
 
-	public int getIOComp(){
-		return IOComp;
-	}
-
-	public boolean getBlocked(){
+	public boolean getBlocked()
+	{
 		return Blocked;
 	}
-	public boolean getLatched(){
+
+	public boolean getLatched()
+	{
 		return Latched;
 	}
-	public boolean getInCore(){
+
+	public boolean getInCore()
+	{
 		return InCore;
 	}
-	public boolean getTerminated(){
+
+	public boolean getTerminated()
+	{
 		return Terminated;
 	}
 
-	public int getMemoryAddress(){
+	public int getMemoryAddress()
+	{
 		return MemoryAddress;
 	}
 
-	public int getStartTime(){
+	public int getStartTime()
+	{
 		return StartTime;
 	}
 
-
-//setters
-
-	public void setCpuTimeUsed(int time){
+	/*
+	 * Setters functions to save Job's variables
+	 */
+	public void setCpuTimeUsed(int time)
+	{
 		this.CpuTimeUsed += time;
-
 	}
 
-	public void setCpuTimeNeeded(int time){
+	public void setCpuTimeNeeded(int time)
+	{
 		this.CpuTimeNeeded -= time;
-
 	}
 
-	public void setIOPending(){
+	public void setIOPending()
+	{
 		this.IOPending++;
 	}
 
-	public void decIOPending() {
+	public void decIOPending()
+	{
 		this.IOPending--;
 	}
 
-	public void setIOComp(){
-		this.IOComp++;
-	}
-
-	public void setBlocked(){
+	public void setBlocked()
+	{
 		this.Blocked = true;
 	}
 
-	public void unBlocked(){
+	public void unBlocked()
+	{
 		this.Blocked = false;
 	}
-	public void setLatched(){
+
+	public void setLatched()
+	{
 		this.Latched = true;
 	}
-	public void unLatched(){
+
+	public void unLatched()
+	{
 		this.Latched = false;
 	}
 
-	public void setInCore(){
+	public void setInCore()
+	{
 		this.InCore = true;
 	}
 
-	public void setOutOfCore(){
+	public void setOutOfCore()
+	{
 		this.InCore = false;
 	}
-	public void setTerminated(){
+
+	public void setTerminated()
+	{
 		this.Terminated = true;
 	}
-	//memory
-	public void setMemoryAddress(int MemoryIndex){
+
+	public void setMemoryAddress(int MemoryIndex)
+	{
 		this.MemoryAddress = MemoryIndex;
 	}
 
-	public void setStartTime( int time){
+	public void setStartTime( int time)
+	{
 		this.StartTime = time;
 	}
-
-
 
 }
