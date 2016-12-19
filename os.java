@@ -38,13 +38,15 @@ public class os
 	public static int direction;
 	public static int jobMemoryBorder;
 	
+	public static int [][] BestFitTable;
+	
 	/*
 	 * Allowing to initialize necessary variables to start process
      * Called once at start of the simulation by sos
 	 */
 	public static void startup() 
 	{  
-		sos.offtrace();
+		sos.ontrace();
 		//creates all queues 
 		readyQueue = new LinkedList<Integer>();
 		ioQueue = new LinkedList<Integer>();
@@ -76,6 +78,9 @@ public class os
 		{
 			MemoryTable[i] = 0;
 		}
+		BestFitTable = new int [50][2]; // [][0] = Size of Memory [][1] = Address in Memory Table
+		BestFitTable [0][0] = MEMORYSIZE;
+		BestFitTable [0][1] = 0;
 	}
 	
 	/*
@@ -436,6 +441,7 @@ public class os
 	 * calls function to fill assigned space in MemoryTable with Job Number
 	 * returns true is space is found and false if not
 	 */
+	/*
 	public static boolean findMemorySpace(int jobNum) {
 		//temp variables to use in search for free space
 		int freeSpace;
@@ -465,6 +471,75 @@ public class os
 		}
 		return memoryAvailable;
 	}
+	*/
+	public static boolean findMemorySpace(int jobNum){
+		if (BestFitTable[0][0] == MEMORYSIZE){
+			updateBestFit(0);
+		}
+		for (int i = 0; i< 100; i++){
+			if (BestFitTable[i][0] >= JobTable.get(jobNum).getJobSize()){
+				JobTable.get(jobNum).setMemoryAddress(BestFitTable[i][1]);
+				JobTable.get(jobNum).setInCore();
+				fillMemory(jobNum);
+				updateBestFit(i);
+				//memoryAvailable = true;
+				return true;
+			}
+		}
+		return false;
+		
+		
+	}
+
+	public static void updateBestFit(int index){
+		int size = 0;
+		int tmpSize, tmpAddress;
+		//int index = 0;
+		for (int i=0; i<100; i++){
+			if (MemoryTable[i] == 0){
+				size++;
+			}
+			if (MemoryTable[i] > 0 && size > 0) {
+				BestFitTable[index][0] = size;
+				BestFitTable[index][1] = i;
+				index++;
+			}
+		}
+		//index = combineBFT(index+1);
+		for (int i=0; i<index+1; i++){
+			for (int j = 0; j<i; j++){
+				if (BestFitTable[j][0] > BestFitTable[i][0]){}
+				tmpSize = BestFitTable[j][0];
+				tmpAddress = BestFitTable[j][1];
+				BestFitTable[j][0] = BestFitTable[i][0];
+				BestFitTable[j][1] = BestFitTable[i][1];
+				
+				BestFitTable[i][0] = tmpSize;
+				BestFitTable[i][1] = tmpAddress;
+			}
+		}
+	} 
+	/*
+	Checks to see if any adresses are next to each other and can be combined
+	*/
+	public static int combineBFT(int index){
+		int totalAddress;
+		for (int i=0; i< index; i++){
+			totalAddress = BestFitTable[i][0] + BestFitTable[i][1];
+			for (int j=index-1; j>i; j--){
+				if (BestFitTable[j][1] == totalAddress){
+				BestFitTable[i][0] = BestFitTable[i][0] + BestFitTable[j][0];
+				BestFitTable[j][0] = BestFitTable [index-1][0];
+				BestFitTable[j][1] = BestFitTable [index-1][1];
+				BestFitTable [index-1][1] = 0;
+				BestFitTable [index-1][1] = 0;
+				index--;
+				}
+			}
+		}
+		return index;
+	}
+	
 
 	/*
 	 * method to fill found free space with Job Number
